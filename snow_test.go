@@ -18,12 +18,12 @@ func TestGenerator_Generate(t *testing.T) {
 		}
 	}()
 
-	g1 := flakeid.NewGenerator(1)
-	g2 := flakeid.NewGenerator(2)
-	g3 := flakeid.NewGenerator(3)
-	g4 := flakeid.NewGenerator(4)
-	g5 := flakeid.NewGenerator(5)
-	g6 := flakeid.NewGenerator(6)
+	g1 := NewGenerator(1)
+	g2 := NewGenerator(2)
+	g3 := NewGenerator(3)
+	g4 := NewGenerator(4)
+	g5 := NewGenerator(5)
+	g6 := NewGenerator(6)
 
 	for i := 0; i < 1000; i++ {
 		switch i % 6 {
@@ -60,7 +60,7 @@ func TestGenerator_Generate(t *testing.T) {
 }
 
 func BenchmarkGenerator_Generate(b *testing.B) {
-	g := flakeid.NewGenerator(1)
+	g := NewGenerator(1)
 	for i := 0; i < b.N; i++ {
 		g.Generate()
 	}
