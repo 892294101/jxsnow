@@ -1,6 +1,7 @@
 package jxsnow
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -24,18 +25,18 @@ const (
 )
 
 // NewGenerator 创建一个生成 ID 对象。每个节点的 machineID 必须不同。
-func NewGenerator(machineID int64) *Generator {
+func NewGenerator(machineID int64) (*Generator, error) {
 	if machineID > maxMachineID {
-		panic("机器 ID 过大")
+		return nil, fmt.Errorf("%s", "machine code is too large")
 	}
 	return &Generator{
 		machineID: machineID,
 		timestamp: time.Now().UnixMilli(),
-	}
+	}, nil
 }
 
 // Generate 雪花算法生成 ID。41 位毫秒时间戳，10 位工作机器 ID，12 位序列号。
-func (g *Generator) Generate() int64 {
+func (g *Generator) Generate() (int64, error) {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 
@@ -55,19 +56,28 @@ func (g *Generator) Generate() int64 {
 	}
 
 	if g.timestamp > maxTimestamp {
-		panic("时间超位")
+		return 0, fmt.Errorf("%s", "time has exceeded its limit")
 	}
 
-	return g.timestamp<<timestampShiftBits | g.machineID<<machineIDShiftBits | g.sequence
+	return g.timestamp<<timestampShiftBits | g.machineID<<machineIDShiftBits | g.sequence, nil
 }
 
 func (g *Generator) nextTime(timestamp int64) int64 {
-	for {
+	/*for {
 		t := time.Now().UnixMilli()
 		if t < timestamp {
 			time.Sleep(time.Millisecond)
 			continue
 		}
 		return t
+	}*/
+	for {
+		t := time.Now().UnixMilli()
+		if t >= timestamp {
+			return t
+		}
+
+		// 使用指数退避策略避免频繁调用
+		time.Sleep(time.Duration(1<<(timestamp-t)) * time.Microsecond)
 	}
 }

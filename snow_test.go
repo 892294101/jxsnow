@@ -18,38 +18,44 @@ func TestGenerator_Generate(t *testing.T) {
 		}
 	}()
 
-	g1 := NewGenerator(1)
-	g2 := NewGenerator(2)
-	g3 := NewGenerator(3)
-	g4 := NewGenerator(4)
-	g5 := NewGenerator(5)
-	g6 := NewGenerator(6)
+	g1, _ := NewGenerator(1)
+	g2, _ := NewGenerator(2)
+	g3, _ := NewGenerator(3)
+	g4, _ := NewGenerator(4)
+	g5, _ := NewGenerator(5)
+	g6, _ := NewGenerator(6)
 
 	for i := 0; i < 1000; i++ {
 		switch i % 6 {
 		case 0:
 			go func() {
-				ch <- g2.Generate()
+				g2, _ := g2.Generate()
+				ch <- g2
 			}()
 		case 1:
 			go func() {
-				ch <- g3.Generate()
+				g3, _ := g3.Generate()
+				ch <- g3
 			}()
 		case 2:
 			go func() {
-				ch <- g4.Generate()
+				g4, _ := g4.Generate()
+				ch <- g4
 			}()
 		case 3:
 			go func() {
-				ch <- g5.Generate()
+				g5, _ := g5.Generate()
+				ch <- g5
 			}()
 		case 4:
 			go func() {
-				ch <- g6.Generate()
+				g6, _ := g6.Generate()
+				ch <- g6
 			}()
 		case 5:
 			go func() {
-				ch <- g1.Generate()
+				g1, _ := g1.Generate()
+				ch <- g1
 			}()
 		default:
 			t.Fatal(i)
@@ -60,7 +66,7 @@ func TestGenerator_Generate(t *testing.T) {
 }
 
 func BenchmarkGenerator_Generate(b *testing.B) {
-	g := NewGenerator(1)
+	g, _ := NewGenerator(1)
 	for i := 0; i < b.N; i++ {
 		g.Generate()
 	}
